@@ -1,1 +1,184 @@
-
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>5형식 문법 구조 학습도구</title>
+<style>
+:root{
+ --site-primary:#254E70;--site-on-primary:#FFFFFF;
+ --site-secondary:#DCEAF2;--site-on-secondary:#17354A;
+ --site-background:#F4F7FA;--site-on-background:#172B3A;
+ --site-font-body:Inter,"Noto Sans KR",system-ui,sans-serif;
+ --site-font-heading:Inter,"Noto Sans KR",system-ui,sans-serif;
+ --site-heading-scale:1;--site-spacing-scale:1;--site-radius-scale:1;--site-decoration-opacity:1;
+ --surface:light-dark(#FFFFFF,#18232D);--surface-2:light-dark(#F7FAFC,#202F3B);
+ --ink:light-dark(#172B3A,#EDF4F8);--muted:light-dark(#627587,#A9BBC8);
+ --line:light-dark(#DCE5EC,#344754);--good:#18794E;--bad:#B93838;
+}
+*{box-sizing:border-box} body{margin:0;background:var(--site-background);color:var(--ink);font-family:var(--site-font-body)}
+button,input{font:inherit} button{cursor:pointer;transition:.16s ease}
+#app{min-height:100vh;background-color:var(--site-background);color:var(--site-on-background);border-radius:0}
+header{background:var(--site-primary);color:var(--site-on-primary);padding:24px clamp(18px,5vw,64px) 22px}
+.topline{display:flex;justify-content:space-between;gap:16px;align-items:center;max-width:1120px;margin:auto}
+.brand{font-size:12px;letter-spacing:.15em;text-transform:uppercase;opacity:.8}
+header h1{font-size:calc(26px * var(--site-heading-scale));line-height:1.25;margin:8px 0 6px}
+header p{margin:0;color:inherit;opacity:.82;font-size:14px}
+main{max-width:1120px;margin:auto;padding:32px clamp(16px,4vw,42px) 60px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:calc(18px * var(--site-radius-scale));padding:clamp(20px,3vw,32px);box-shadow:0 8px 28px #203c5010;margin-bottom:18px}
+.eyebrow{color:var(--muted);font-size:12px;font-weight:750;letter-spacing:.12em;text-transform:uppercase}
+h2{font-size:calc(24px * var(--site-heading-scale));margin:9px 0 8px;color:var(--ink)}
+h3{margin:0 0 8px;font-size:17px;color:var(--ink)}
+p{line-height:1.7}.muted{color:var(--muted)}.small{font-size:13px}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:11px 16px;border-radius:10px;font-weight:700}
+.btn:hover{transform:translateY(-1px);border-color:var(--site-primary)}
+.btn.primary{background:var(--site-primary);color:var(--site-on-primary);border-color:var(--site-primary)}
+.btn.soft{background:var(--site-secondary);color:var(--site-on-secondary);border-color:transparent}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:22px 0}
+.form-card{border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:16px 10px;text-align:center;color:var(--ink)}
+.form-card strong{display:block;font-size:22px;color:var(--site-primary);margin-bottom:7px}
+.form-card span{font-size:12px;color:var(--muted)}
+input{width:100%;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:13px;margin:7px 0 4px;outline-offset:3px}
+label{font-size:13px;font-weight:700;color:var(--ink)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:14px;margin:20px 0}
+.tab{padding:10px 15px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);font-weight:700}
+.tab.active{background:var(--site-primary);color:var(--site-on-primary);border-color:var(--site-primary)}
+.lesson{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:22px}
+.lesson .sentence{font-size:clamp(22px,4vw,30px);font-weight:800;margin:16px 0;color:var(--ink)}
+.pill{display:inline-block;background:var(--site-secondary);color:var(--site-on-secondary);padding:5px 9px;border-radius:20px;font-size:12px;font-weight:750}
+.structure{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.token{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13px}
+.hidden{display:none!important}
+.question-num{font-size:12px;font-weight:800;letter-spacing:.1em;color:var(--muted)}
+.question-sentence{font-size:clamp(23px,4vw,34px);font-weight:800;line-height:1.45;margin:18px 0}
+.answers{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.answer{padding:14px 5px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font-weight:800}
+.answer:hover{border-color:var(--site-primary);background:var(--site-secondary);color:var(--site-on-secondary)}
+.answer:disabled{opacity:.7;cursor:default}
+.feedback{margin-top:16px;padding:16px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);line-height:1.7}
+.good{color:var(--good);font-weight:800}.bad{color:var(--bad);font-weight:800}
+.progress{height:7px;background:var(--line);border-radius:20px;overflow:hidden;margin:12px 0 22px}
+.progress div{height:100%;background:var(--site-primary);width:0;transition:width .2s}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:12px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-size:12px}
+.statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+.stat{padding:16px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px}
+.stat strong{display:block;font-size:25px;margin-top:6px}
+.bar{height:8px;background:var(--line);border-radius:10px;overflow:hidden;margin-top:8px}.bar span{display:block;height:100%;background:var(--site-primary)}
+.notice{font-size:12px;color:var(--muted);margin-top:14px}
+footer{max-width:1120px;margin:auto;padding:0 24px 30px;color:var(--muted);font-size:12px}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(3,1fr)}.answers{grid-template-columns:repeat(5,minmax(0,1fr))}.answer{font-size:12px;padding:12px 2px}.statrow{grid-template-columns:1fr}.topline{align-items:flex-start;flex-direction:column}main{padding-top:20px}}
+</style>
+</head>
+<body>
+<div id="app">
+<header><div class="topline"><div><div class="brand">ENGLISH · SENTENCE LAB</div><h1>5형식 문법 구조 학습도구</h1><p>문장을 읽고, 구조를 발견하고, 실력의 변화를 확인하세요.</p></div><div class="pill">학습 · 진단 · 피드백</div></div></header>
+<main>
+<section id="home" class="panel">
+ <div class="eyebrow">Welcome to Sentence Lab</div><h2>영어 문장 구조, 감이 아닌 근거로</h2>
+ <p class="muted">1~5형식 핵심 개념을 익히고, 랜덤 레벨테스트로 현재 실력을 확인하세요. 학습 기록과 강사 피드백을 확인할 수 있는 인터랙티브 프로토타입입니다.</p>
+ <div class="cards"><div class="form-card"><strong>1형식</strong><span>S + V</span></div><div class="form-card"><strong>2형식</strong><span>S + V + C</span></div><div class="form-card"><strong>3형식</strong><span>S + V + O</span></div><div class="form-card"><strong>4형식</strong><span>S + V + IO + DO</span></div><div class="form-card"><strong>5형식</strong><span>S + V + O + OC</span></div></div>
+ <div class="actions"><button class="btn primary" onclick="show('role')">Start →</button></div>
+</section>
+<section id="role" class="panel hidden">
+ <div class="eyebrow">01 / Role</div><h2>어떤 역할로 시작할까요?</h2><p class="muted">역할을 선택하면 맞춤 화면으로 이동합니다.</p>
+ <div class="grid"><button class="btn" onclick="show('learnerSetup')"><h3>학습자 본인</h3><span class="muted">개념 학습 · 레벨테스트 · 결과 복습</span></button><button class="btn" onclick="show('teacherSetup')"><h3>강사</h3><span class="muted">학습자 성취도 · 피드백 관리</span></button></div>
+ <div class="actions"><button class="btn" onclick="show('home')">← 처음으로</button></div>
+</section>
+<section id="learnerSetup" class="panel hidden">
+ <div class="eyebrow">02 / Learner profile</div><h2>학습 환경 설정</h2><p>강사의 닉네임을 입력하세요. 혼자 학습한다면 ‘없음’을 선택하면 됩니다.</p>
+ <label for="teacherNick">강사 닉네임</label><input id="teacherNick" placeholder="예: 영어쌤 민지" maxlength="40">
+ <div class="actions"><button class="btn soft" onclick="document.getElementById('teacherNick').value='' ; enterLearner()">없음 (독학)</button><button class="btn primary" onclick="enterLearner()">학습 시작 →</button></div>
+</section>
+<section id="teacherSetup" class="panel hidden">
+ <div class="eyebrow">02 / Teacher profile</div><h2>강사 프로필</h2><p class="muted">닉네임은 학습자가 강사를 선택할 때 사용하는 식별명입니다.</p>
+ <label for="teacherName">강사 닉네임</label><input id="teacherName" placeholder="예: 영어쌤 민지" maxlength="40">
+ <div class="actions"><button class="btn primary" onclick="enterTeacher()">대시보드 열기 →</button><button class="btn" onclick="show('role')">뒤로</button></div>
+</section>
+<section id="learn" class="panel hidden">
+ <div class="eyebrow">03 / Learn</div><h2>1~5형식 문법구조 학습하기</h2><p class="muted">형식을 선택해 핵심 설명과 예문을 확인하세요. 다섯 형식을 모두 열면 레벨테스트가 활성화됩니다.</p>
+ <div class="tabs" id="lessonTabs"></div>
+ <div class="lesson"><span id="lessonPill" class="pill">1형식</span><h3 id="lessonTitle" style="margin-top:14px">주어 + 동사</h3><p id="lessonDesc"></p><div class="sentence" id="lessonSentence"></div><div class="structure" id="lessonStructure"></div><p class="muted small" id="lessonNote"></p><button class="btn primary" onclick="newExample()">다른 예문 보기 ↻</button></div>
+ <div class="actions"><button class="btn" onclick="show('history')">내 학습 기록</button><button id="testUnlock" class="btn primary" disabled onclick="startTest()">레벨테스트 (5개 형식 학습 후 활성화)</button><button class="btn" onclick="show('role')">역할 선택으로</button></div>
+</section>
+<section id="test" class="panel hidden">
+ <div class="eyebrow">04 / Level test</div><h2>이 문장은 몇 형식인가요?</h2><p class="muted">정답을 맞히면 다음 문항은 난도가 올라가고, 틀리면 같은 난도로 출제됩니다.</p>
+ <div class="question-num" id="qNum">QUESTION 01 / 10</div><div class="progress"><div id="progressFill"></div></div>
+ <div class="question-sentence" id="qSentence"></div><div class="answers" id="answerBtns"></div>
+ <div id="qFeedback" class="feedback hidden"></div><div class="actions"><button id="nextQ" class="btn primary hidden" onclick="nextQuestion()">다음 문제 →</button><button class="btn" onclick="show('learn')">학습 화면으로</button></div>
+</section>
+<section id="result" class="panel hidden">
+ <div class="eyebrow">05 / Test report</div><h2>레벨테스트 결과</h2><p class="muted" id="resultDate"></p>
+ <div class="statrow"><div class="stat"><span class="muted small">정답</span><strong id="scoreText">0 / 10</strong></div><div class="stat"><span class="muted small">정답률</span><strong id="percentText">0%</strong></div><div class="stat"><span class="muted small">학습 등급</span><strong id="levelText">초급</strong></div></div>
+ <div id="resultRows"></div>
+ <div class="actions"><button class="btn primary" onclick="show('history')">전체 기록 및 복습</button><button class="btn" onclick="startTest()">다시 테스트</button><button class="btn" onclick="show('learn')">학습 계속하기</button></div>
+</section>
+<section id="history" class="panel hidden">
+ <div class="eyebrow">06 / Review history</div><h2>나의 레벨테스트 기록</h2><p class="muted">이 프로토타입은 현재 브라우저에 테스트 결과를 저장합니다.</p><div id="historyList"></div>
+ <div class="actions"><button class="btn primary" onclick="show('learn')">학습 화면</button><button class="btn" onclick="show('role')">역할 선택</button></div>
+</section>
+<section id="teacherDash" class="panel hidden">
+ <div class="eyebrow">Teacher workspace</div><h2 id="dashTitle">강사 대시보드</h2><p class="muted">현재 브라우저에 저장된 학습 기록을 기반으로 만든 데모 대시보드입니다.</p>
+ <div class="statrow"><div class="stat"><span class="muted small">등록 학습 프로필</span><strong id="studentCount">0</strong></div><div class="stat"><span class="muted small">테스트 응시</span><strong id="attemptCount">0</strong></div><div class="stat"><span class="muted small">평균 정답률</span><strong id="avgScore">—</strong></div></div>
+ <div id="teacherStudents"></div><div class="actions"><button class="btn" onclick="show('role')">역할 선택으로</button><button class="btn primary" onclick="show('teacherSetup')">강사 닉네임 변경</button></div>
+</section>
+<section id="studentDetail" class="panel hidden">
+ <div class="eyebrow">Learner detail</div><h2 id="detailTitle">학습자 기록</h2><div id="detailHistory"></div>
+ <h3 style="margin-top:24px">강사 피드백 작성</h3><p class="muted small">피드백은 이 데모의 현재 브라우저에 저장됩니다.</p><textarea id="feedbackInput" rows="4" style="width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)" placeholder="강점, 보완할 문장 구조, 다음 학습 목표를 적어주세요."></textarea>
+ <div class="actions"><button class="btn primary" onclick="saveFeedback()">피드백 저장</button><button class="btn" onclick="show('teacherDash')">대시보드로</button></div><div id="feedbackStatus" class="notice"></div>
+</section>
+</main><footer>Sentence Lab · 공유형 MVP · GPT API는 서버에서 안전하게 호출됩니다. 닉네임 기반 베타이므로 민감한 개인정보는 입력하지 마세요.</footer>
+</div>
+<script>
+const lessons=[
+ {n:1,title:"주어 + 동사 (S + V)",desc:"1형식은 주어(Subject, S)와 동사(Verb, V)만으로 완전한 의미를 이루는 기본 문장 구조입니다. 장소·시간을 나타내는 부사구가 추가될 수 있습니다.",examples:[["Birds fly.","Birds","fly"],["The baby cried loudly.","The baby","cried"],["Our train arrived on time.","Our train","arrived"]],note:"목적어나 보어가 필수로 오지 않아도 문장이 완성됩니다."},
+ {n:2,title:"주어 + 동사 + 주격보어 (S + V + C)",desc:"2형식은 주어와 동사 뒤에 주어의 상태·정체를 설명하는 주격보어(Complement, C)가 옵니다. be, become, seem, look 등의 동사가 자주 쓰입니다.",examples:[["The soup smells delicious.","The soup","smells","delicious"],["Mina became a doctor.","Mina","became","a doctor"],["The sky grew dark.","The sky","grew","dark"]],note:"보어는 주어가 무엇인지 또는 어떤 상태인지 설명합니다."},
+ {n:3,title:"주어 + 동사 + 목적어 (S + V + O)",desc:"3형식은 동사의 동작이 미치는 대상인 목적어(Object, O)가 오는 구조입니다. 목적어는 보통 ‘누구를/무엇을?’에 답합니다.",examples:[["Jin reads novels every night.","Jin","reads","novels"],["They repaired the old bridge.","They","repaired","the old bridge"],["We discussed the proposal carefully.","We","discussed","the proposal"]],note:"목적어와 주격보어를 구별하세요. 목적어는 동작의 대상입니다."},
+ {n:4,title:"주어 + 동사 + 간접목적어 + 직접목적어 (S + V + IO + DO)",desc:"4형식은 보통 ‘누구에게(IO) 무엇을(DO) 주다·보내다·말하다’처럼 목적어가 두 개 오는 구조입니다.",examples:[["The teacher gave us homework.","The teacher","gave","us","homework"],["I sent my friend a message.","I","sent","my friend","a message"],["Dad bought me a warm jacket.","Dad","bought","me","a warm jacket"]],note:"간접목적어는 받는 사람, 직접목적어는 전달되는 대상인 경우가 많습니다."},
+ {n:5,title:"주어 + 동사 + 목적어 + 목적격보어 (S + V + O + OC)",desc:"5형식은 목적어(O) 뒤에 목적어의 상태·정체·동작을 설명하는 목적격보어(Object Complement, OC)가 옵니다.",examples:[["They elected her captain.","They","elected","her","captain"],["The news made him happy.","The news","made","him","happy"],["We found the room empty.","We","found","the room","empty"]],note:"목적어와 목적격보어 사이에 ‘O는 OC이다/OC한 상태다’라는 관계가 성립합니다."}
+];
+const pool=[
+ {s:"Birds fly.",a:1,d:1,why:"Birds가 주어(S), fly가 동사(V)이며 필수 목적어·보어 없이 문장이 완성됩니다.",parts:[["Birds","S"],["fly","V"]]},
+ {s:"The children laughed loudly.",a:1,d:1,why:"The children(S) + laughed(V)가 핵심 구조입니다. loudly는 부사로 동사를 꾸밉니다.",parts:[["The children","S"],["laughed","V"],["loudly","부사"]]},
+ {s:"The milk turned sour.",a:2,d:1,why:"The milk(S) + turned(V) + sour(C). sour는 주어인 우유의 상태를 설명하는 주격보어입니다.",parts:[["The milk","S"],["turned","V"],["sour","C"]]},
+ {s:"Nora looks tired after work.",a:2,d:2,why:"Nora(S) + looks(V) + tired(C)가 핵심입니다. after work는 시간 부사구입니다.",parts:[["Nora","S"],["looks","V"],["tired","C"],["after work","부사구"]]},
+ {s:"We watched the match.",a:3,d:1,why:"We(S) + watched(V) + the match(O). the match는 watched의 대상인 목적어입니다.",parts:[["We","S"],["watched","V"],["the match","O"]]},
+ {s:"The committee approved our plan unanimously.",a:3,d:2,why:"The committee(S) + approved(V) + our plan(O). unanimously는 동사를 수식하는 부사입니다.",parts:[["The committee","S"],["approved","V"],["our plan","O"],["unanimously","부사"]]},
+ {s:"She taught the children English.",a:4,d:2,why:"She(S) + taught(V) + the children(IO) + English(DO). 아이들은 받는 사람, 영어는 가르친 내용입니다.",parts:[["She","S"],["taught","V"],["the children","IO"],["English","DO"]]},
+ {s:"I will send you the updated schedule tomorrow.",a:4,d:3,why:"I(S) + will send(V) + you(IO) + the updated schedule(DO). tomorrow는 시간 부사입니다.",parts:[["I","S"],["will send","V"],["you","IO"],["the updated schedule","DO"],["tomorrow","부사"]]},
+ {s:"The joke made everyone uncomfortable.",a:5,d:2,why:"The joke(S) + made(V) + everyone(O) + uncomfortable(OC). uncomfortable은 everyone의 상태를 설명합니다.",parts:[["The joke","S"],["made","V"],["everyone","O"],["uncomfortable","OC"]]},
+ {s:"The manager considered the proposal unusually risky.",a:5,d:3,why:"The manager(S) + considered(V) + the proposal(O) + unusually risky(OC). risky는 proposal의 성질을 설명하고 unusually는 risky를 수식합니다.",parts:[["The manager","S"],["considered","V"],["the proposal","O"],["unusually risky","OC"]]},
+ {s:"After the long rehearsal, the performers remained calm.",a:2,d:3,why:"주절은 the performers(S) + remained(V) + calm(C)입니다. 문장 앞의 after 구는 부사구입니다.",parts:[["the performers","S"],["remained","V"],["calm","C"]]},
+ {s:"The guide showed the visitors a hidden courtyard.",a:4,d:3,why:"The guide(S) + showed(V) + the visitors(IO) + a hidden courtyard(DO). 목적어가 받는 사람과 보여 준 대상 두 개입니다.",parts:[["The guide","S"],["showed","V"],["the visitors","IO"],["a hidden courtyard","DO"]]},
+ {s:"We found the instructions confusing at first.",a:5,d:3,why:"We(S) + found(V) + the instructions(O) + confusing(OC). confusing은 instructions가 어떤 것이었는지 설명합니다. at first는 부사구입니다.",parts:[["We","S"],["found","V"],["the instructions","O"],["confusing","OC"]]},
+ {s:"The old engine suddenly stopped.",a:1,d:2,why:"The old engine(S) + stopped(V)가 핵심입니다. suddenly는 부사로 동작을 꾸밉니다.",parts:[["The old engine","S"],["stopped","V"],["suddenly","부사"]]},
+ {s:"Her explanation sounded perfectly reasonable.",a:2,d:3,why:"Her explanation(S) + sounded(V) + reasonable(C). perfectly는 보어 reasonable을 수식하는 부사입니다.",parts:[["Her explanation","S"],["sounded","V"],["perfectly reasonable","C"]]},
+ {s:"The researcher analyzed the results in detail.",a:3,d:3,why:"The researcher(S) + analyzed(V) + the results(O). in detail은 부사구이며 목적어가 아닙니다.",parts:[["The researcher","S"],["analyzed","V"],["the results","O"],["in detail","부사구"]]},
+ {s:"The director appointed Lena team leader.",a:5,d:3,why:"The director(S) + appointed(V) + Lena(O) + team leader(OC). team leader는 Lena의 역할을 설명합니다.",parts:[["The director","S"],["appointed","V"],["Lena","O"],["team leader","OC"]]},
+ {s:"He offered his colleague a practical solution.",a:4,d:2,why:"He(S) + offered(V) + his colleague(IO) + a practical solution(DO). 동료는 받는 사람, 해결책은 제안한 대상입니다.",parts:[["He","S"],["offered","V"],["his colleague","IO"],["a practical solution","DO"]]}
+];
+let role="learner", learnerName="학습자", teacherNick="", currentLesson=1, seen=new Set(), exampleIdx={1:0,2:0,3:0,4:0,5:0}, questions=[], qIndex=0, answers=[], currentStudent="";
+const $=id=>document.getElementById(id);
+function show(id){document.querySelectorAll("main>section").forEach(s=>s.classList.add("hidden"));$(id).classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});if(id==="history")renderHistory();if(id==="teacherDash")renderDashboard();}
+function enterLearner(){role="learner";teacherNick=$("teacherNick").value.trim();learnerName=prompt("학습 기록에 사용할 닉네임을 입력하세요 (비워두면 '학습자')","")?.trim()||"학습자";renderLessonTabs();show("learn");}
+function enterTeacher(){role="teacher";teacherNick=$("teacherName").value.trim()||"강사";$("dashTitle").textContent=teacherNick+" 강사 대시보드";show("teacherDash");}
+function renderLessonTabs(){$("lessonTabs").innerHTML=lessons.map(l=>`<button class="tab ${l.n===currentLesson?'active':''}" onclick="openLesson(${l.n})">${l.n}형식</button>`).join("");renderLesson();}
+function openLesson(n){currentLesson=n;seen.add(n);renderLessonTabs();$("testUnlock").disabled=seen.size<5;$("testUnlock").textContent=seen.size<5?`레벨테스트 (${seen.size}/5개 형식 학습 후 활성화)`:"레벨테스트 시작 →";}
+function renderLesson(){let l=lessons[currentLesson-1],e=l.examples[exampleIdx[currentLesson]%l.examples.length],labels=[["S","V"],["S","V","C"],["S","V","O"],["S","V","IO","DO"],["S","V","O","OC"]][currentLesson-1];$("lessonPill").textContent=l.n+"형식";$("lessonTitle").textContent=l.title;$("lessonDesc").textContent=l.desc;$("lessonSentence").textContent=e[0];$("lessonStructure").innerHTML=e.slice(1).map((x,i)=>`<span class="token"><b>${x}</b> · ${labels[i]||"수식어"}</span>`).join("");$("lessonNote").textContent=l.note;}
+function newExample(){exampleIdx[currentLesson]++;renderLesson();}
+async function makeQuestions(){let difficulty=1,used=[];questions=[];for(let i=0;i<10;i++){let q=null;try{const res=await fetch(`/api/question?difficulty=${difficulty}&exclude=${encodeURIComponent(used.join("|"))}`);if(res.ok)q=await res.json();}catch(e){}if(!q||!q.s){let choices=pool.filter(p=>p.d<=difficulty&&!used.includes(p.s));if(!choices.length)choices=pool.filter(p=>p.d<=difficulty);q={...choices[Math.floor(Math.random()*choices.length)]};}used.push(q.s);questions.push({...q});}qIndex=0;answers=[];renderQuestion();}
+async function startTest(){if(seen.size<5){alert("먼저 1~5형식 탭을 모두 열어 학습해 주세요.");return;}show("test");$("qSentence").textContent="문제를 준비하고 있습니다…";$("answerBtns").innerHTML="";await makeQuestions();renderQuestion();}
+function renderQuestion(){let q=questions[qIndex];$("qNum").textContent=`QUESTION ${String(qIndex+1).padStart(2,"0")} / 10`; $("progressFill").style.width=(qIndex*10)+"%";$("qSentence").textContent=q.s;$("qFeedback").classList.add("hidden");$("nextQ").classList.add("hidden");$("answerBtns").innerHTML=[1,2,3,4,5].map(n=>`<button class="answer" onclick="answerQuestion(${n})">${n}형식</button>`).join("");}
+function answerQuestion(n){let q=questions[qIndex];if(answers[qIndex])return;let correct=n===q.a;answers[qIndex]={selected:n,correct};document.querySelectorAll(".answer").forEach(b=>{b.disabled=true;if(b.textContent===q.a+"형식")b.style.borderColor="var(--good)";});let parts=q.parts.map(p=>`<span class="token"><u>${p[0]}</u> <b>${p[1]}</b></span>`).join("");$("qFeedback").innerHTML=`<div class="${correct?'good':'bad'}">${correct?'정답입니다!':'아쉬워요. 정답은 '+q.a+'형식입니다.'}</div><p>${q.why}</p><div class="structure">${parts}</div><p class="small muted">밑줄 친 핵심 어구의 기능을 확인하세요. 약어: S 주어 · V 동사 · O 목적어 · C 보어 · IO 간접목적어 · DO 직접목적어 · OC 목적격보어</p>`;$("qFeedback").classList.remove("hidden");$("nextQ").classList.remove("hidden");$("nextQ").textContent=qIndex===9?"결과 확인 →":"다음 문제 →";}
+function nextQuestion(){if(qIndex<9){let last=answers[qIndex];let next=questions[qIndex+1];if(last.correct){let higher=pool.filter(p=>p.d>next.d&&!questions.some((x,i)=>i<=qIndex&&x.s===p.s));if(higher.length){let p=higher[Math.floor(Math.random()*higher.length)];questions[qIndex+1]={...p};}}else{let same=pool.filter(p=>p.d===questions[qIndex].d&&p.s!==questions[qIndex].s);if(same.length)questions[qIndex+1]={...same[Math.floor(Math.random()*same.length)]};}qIndex++;renderQuestion();}else finishTest();}
+async function finishTest(){let score=answers.filter(a=>a.correct).length,level=score<=4?"초급":score<=7?"중급":"고급",date=new Date().toLocaleString("ko-KR");let record={date,score,level,questions:questions.map((q,i)=>({...q,...answers[i]})),learner:learnerName,teacher:teacherNick};let all=JSON.parse(localStorage.getItem("sentenceLabRecords")||"[]");all.unshift(record);localStorage.setItem("sentenceLabRecords",JSON.stringify(all));try{const r=await fetch("/api/results",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(record)});if(r.ok){record=await r.json();}}catch(e){console.warn("서버 저장 실패: 브라우저에만 저장했습니다.",e)}$("resultDate").textContent="응시일: "+date;$("scoreText").textContent=score+" / 10";$("percentText").textContent=score*10+"%";$("levelText").textContent=level;$("resultRows").innerHTML=record.questions.map((q,i)=>`<div class="feedback"><b>${i+1}. ${q.s}</b><p><span class="${q.correct?'good':'bad'}">${q.correct?'정답':'오답'} · 내 답 ${q.selected}형식 · 정답 ${q.a}형식</span></p><p>${q.why}</p><div class="structure">${q.parts.map(p=>`<span class="token"><u>${p[0]}</u> <b>${p[1]}</b></span>`).join("")}</div></div>`).join("");show("result");}
+function getRecords(){return JSON.parse(localStorage.getItem("sentenceLabRecords")||"[]");}
+async function fetchServerRecords(){try{const r=await fetch("/api/results");if(r.ok)return await r.json();}catch(e){}return getRecords();}
+async function renderHistory(){let all=await fetchServerRecords();let records=all.filter(r=>r.learner===learnerName);if(!records.length){$("historyList").innerHTML='<p class="muted">아직 저장된 테스트 결과가 없습니다. 형식 학습 후 레벨테스트를 진행해 보세요.</p>';return;}$("historyList").innerHTML=records.map((r,idx)=>`<div class="feedback"><div class="eyebrow">${r.date}</div><h3>${r.score}/10 · ${r.level}</h3><p class="muted small">강사: ${r.teacher||"없음(독학)"}</p><button class="btn soft" onclick="reviewRecord(${idx})">이 결과 복습하기</button></div>`).join("");}
+function reviewRecord(idx){let records=getRecords().filter(r=>r.learner===learnerName),r=records[idx];$("resultDate").textContent="복습 기록: "+r.date;$("scoreText").textContent=r.score+" / 10";$("percentText").textContent=r.score*10+"%";$("levelText").textContent=r.level;$("resultRows").innerHTML=r.questions.map((q,i)=>`<div class="feedback"><b>${i+1}. ${q.s}</b><p><span class="${q.correct?'good':'bad'}">${q.correct?'정답':'오답'} · 내 답 ${q.selected}형식 · 정답 ${q.a}형식</span></p><p>${q.why}</p><div class="structure">${q.parts.map(p=>`<span class="token"><u>${p[0]}</u> <b>${p[1]}</b></span>`).join("")}</div></div>`).join("");show("result");}
+async function renderDashboard(){let all=await fetchServerRecords(),students=[...new Set(all.filter(r=>!teacherNick||r.teacher===teacherNick).map(r=>r.learner))],recs=all.filter(r=>!teacherNick||r.teacher===teacherNick);$("studentCount").textContent=students.length;$("attemptCount").textContent=recs.length;$("avgScore").textContent=recs.length?Math.round(recs.reduce((a,r)=>a+r.score,0)/recs.length*10)+"%":"—";$("teacherStudents").innerHTML=students.length?students.map(s=>{let rs=recs.filter(r=>r.learner===s),avg=Math.round(rs.reduce((a,r)=>a+r.score,0)/rs.length*10);return `<div class="feedback"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div><h3>${s}</h3><p class="muted small">${rs.length}회 응시 · 최근 ${rs[0].date}</p></div><strong>${avg}%</strong></div><div class="bar"><span style="width:${avg}%"></span></div><div class="actions"><button class="btn soft" onclick="openStudent('${s.replace(/'/g,"\\'")}')">학습자 기록 및 피드백 →</button></div></div>`}).join(""):'<p class="muted">표시할 기록이 없습니다. 학습자가 이 브라우저에서 강사 닉네임을 연결하고 테스트를 완료하면 기록이 나타납니다.</p>';}
+async function openStudent(s){currentStudent=s;let rs=getRecords().filter(r=>r.learner===s&&(!teacherNick||r.teacher===teacherNick));$("detailTitle").textContent=s+" 학습자 기록";$("detailHistory").innerHTML=rs.map(r=>`<div class="feedback"><b>${r.date} · ${r.score}/10 · ${r.level}</b><div class="bar"><span style="width:${r.score*10}%"></span></div><p class="muted small">${r.questions.map((q,i)=>`${i+1}번 ${q.correct?'✓':'✕'} (${q.a}형식)`).join(" · ")}</p></div>`).join("");$("feedbackInput").value=localStorage.getItem("sentenceLabFeedback:"+teacherNick+":"+s)||"";try{const fr=await fetch(`/api/feedback?teacher=${encodeURIComponent(teacherNick)}&learner=${encodeURIComponent(s)}`);if(fr.ok){const fd=await fr.json();$("feedbackInput").value=fd.feedback||$("feedbackInput").value;}}catch(e){}$("feedbackStatus").textContent="";show("studentDetail");}
+async function saveFeedback(){let body={teacher:teacherNick,learner:currentStudent,feedback:$("feedbackInput").value};localStorage.setItem("sentenceLabFeedback:"+teacherNick+":"+currentStudent,body.feedback);try{const r=await fetch("/api/feedback",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});if(!r.ok)throw new Error("server");$("feedbackStatus").textContent="서버에 피드백을 저장했습니다.";}catch(e){$("feedbackStatus").textContent="현재 브라우저에 피드백을 저장했습니다. 서버 연결을 확인해 주세요.";}}
+</script>
+</body></html>
